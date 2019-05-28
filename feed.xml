@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.5">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2019-05-28T16:26:01-04:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Nathan’s Personal Website</title><subtitle>I am a recent Graduate from the University of Maine with a Professional Science Master's in Bioinformatics.</subtitle><entry><title type="html">Archiving Text in DNA part 1 - Archiving</title><link href="http://localhost:4000/2019/05/28/Archiving-text-in-DNA.html" rel="alternate" type="text/html" title="Archiving Text in DNA part 1 - Archiving" /><published>2019-05-28T10:38:13-04:00</published><updated>2019-05-28T10:38:13-04:00</updated><id>http://localhost:4000/2019/05/28/Archiving-text-in-DNA</id><content type="html" xml:base="http://localhost:4000/2019/05/28/Archiving-text-in-DNA.html">&lt;p&gt;&lt;a id=&quot;top&quot;&gt;&lt;/a&gt;During my digital preservation class in my final semester of graduate school the topic using DNA as an 
+archival medium for digital objects arose for discussion.  Apparently this has already been done.  One 
+of the first attempts being the archival of text within the a strand of DNA and the successful 
+retrieval of the text from the DNA strand.  There are many benefits of this strategy. 
+The most obvious being that if successful the archive could potentially last for thousands of years 
+(as long as the DNA does denature).&lt;/p&gt;
+
+&lt;p&gt;Before jumping on the bandwagon I decided to try this out for myself.  What better way to learn about 
+the benefits and flaws of an archival strategy than to get down and dirty and simply try 
+using it?  And what better language than Python for parsing and string and list manipulation?&lt;br /&gt;
+In this post my goal was to simply store a text file in a strand of DNA.  I have no idea how those 
+before me went about achieving this but here is with what I came up.&lt;/p&gt;
+
+&lt;p&gt;First I had to import a couple of libraries that I would need and then open a read file and a write file.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;import binascii
+from textwrap import wrap
+
+infile = raw_input(&quot;Please enter the file you would like to archive: &quot;)
+out = raw_input(&quot;Please enter a name for the archived file: &quot;)
+outfile = open(out, &quot;w&quot;)
+with open(infile, &quot;r&quot;) as myfile:
+    f = myfile.readlines()
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;The next step would be to convert the text file into a bitstream.  To do this I had to first perform
+a hexdump and then convert the base 16 hexdump to binary base 2.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;numeric = int(hexdump, 16)
+binary = format(numeric, &quot;b&quot;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Knowing that I was working with a total of four nucleotides I decided to split the bitstream into
+into a list where every element consisted of two numbers.  This left four possible combinations (00, 
+01, 10 or 11).&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;code = wrap(binary, 2)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Now I could assign a nucleotide to each one of these number combinations and begin constructing 
+the DNA sequence in the form of a list.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;DNA = []
+for i in code:
+    if i == &quot;00&quot;:
+        DNA.append(&quot;A&quot;)
+    elif i == &quot;01&quot;:
+        DNA.append(&quot;C&quot;)
+    elif i == &quot;10&quot;:
+        DNA.append(&quot;G&quot;)
+    elif i == &quot;11&quot;:
+        DNA.append(&quot;T&quot;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Great.  But what happens when the bitstream has an odd number of characters?  Then the last bit could 
+be either a 1 or a 0 instead of the assigned combinations.  In this case a appended a long string 
+of A’s to a value of 0 and a long string of T’s to a value of 1.  (I will show what to do with 
+these tails in Part 2 where I tried to translate back to the original text.)&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;   elif i == &quot;0&quot;:
+        DNA.append(&quot;AAAAAAAAAAAAAAAAAAAA&quot;)
+    else:
+        DNA.append(&quot;TTTTTTTTTTTTTTTTTTTT&quot;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Next I converted the list of nucleotides to a DNA string and wrote the string to a file.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;storage_code = &quot;&quot;.join(DNA)
+outfile.write(storage_code)
+outfile.close()
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Here is the script in its entirety.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;import binascii
+from textwrap import wrap
+
+infile = raw_input(&quot;Please enter the file you would like to archive: &quot;)
+out = raw_input(&quot;Please enter a name for the archived file: &quot;)
+outfile = open(out, &quot;w&quot;)
+with open(infile, &quot;r&quot;) as myfile:
+    f = myfile.readlines()
+
+dump = &quot; &quot;.join(f)
+hexdump = binascii.hexlify(dump)
+
+numeric = int(hexdump, 16)
+binary = format(numeric, &quot;b&quot;)
+code = wrap(binary, 2)
+
+DNA = []
+for i in code:
+    if i == &quot;00&quot;:
+        DNA.append(&quot;A&quot;)
+    elif i == &quot;01&quot;:
+        DNA.append(&quot;C&quot;)
+    elif i == &quot;10&quot;:
+        DNA.append(&quot;G&quot;)
+    elif i == &quot;11&quot;:
+        DNA.append(&quot;T&quot;)
+    elif i == &quot;0&quot;:
+        DNA.append(&quot;AAAAAAAAAAAAAAAAAAAA&quot;)
+    else:
+        DNA.append(&quot;TTTTTTTTTTTTTTTTTTTT&quot;)
+storage_code = &quot;&quot;.join(DNA)
+outfile.write(storage_code)
+outfile.close()
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;If we try it with a text file containing “Hello World!” we get this.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;GAGCAGACGCCCGTACGTACGTTAGAACCCTCGTTCTAGCGTACGCAAGACAGAGAAGG
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Okay.  Now try it with the complete text of Romeo and Juliet downloaded from Project Gutenberg in 
+text format.  Let it run for about two or three hours and the play will be archived in DNA strand whose
+length is over 300,000 nucleotides long after two or three hours.&lt;/p&gt;
+
+&lt;p&gt;The point here is that although it might work, for anything larger than a simple message the conversion
+is incredibly inefficient.  Not to mention that at this point we don’t know if we can get the original
+text back and if the information cannot be found then the information was never really archived.  More 
+on this in part two where I attempted to bring back the original from the DNA strand.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;/blog.html&quot;&gt;back to blog&lt;/a&gt;  &lt;a href=&quot;#top&quot;&gt;back to top&lt;/a&gt;&lt;/p&gt;</content><author><name></name></author><summary type="html">During my digital preservation class in my final semester of graduate school the topic using DNA as an archival medium for digital objects arose for discussion. Apparently this has already been done. One of the first attempts being the archival of text within the a strand of DNA and the successful retrieval of the text from the DNA strand. There are many benefits of this strategy. The most obvious being that if successful the archive could potentially last for thousands of years (as long as the DNA does denature). Before jumping on the bandwagon I decided to try this out for myself. What better way to learn about the benefits and flaws of an archival strategy than to get down and dirty and simply try using it? And what better language than Python for parsing and string and list manipulation? In this post my goal was to simply store a text file in a strand of DNA. I have no idea how those before me went about achieving this but here is with what I came up. First I had to import a couple of libraries that I would need and then open a read file and a write file.</summary></entry></feed>

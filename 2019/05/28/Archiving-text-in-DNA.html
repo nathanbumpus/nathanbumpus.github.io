@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+  <head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>
+    
+      Archiving Text in DNA part 1 - Archiving &middot; Nathan's Personal Website
+    
+  </title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href=/assets/css/styles.css>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Serif:400,400italic,700%7CPT+Sans:400">
+
+  <!-- Icons -->
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href=/assets/apple-touch-icon-precomposed.png>
+  <link rel="shortcut icon" href=/assets/favicon.ico>
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="Nathan&#39;s Personal Website" href="/feed.xml">
+</head>
+
+
+  <body>
+
+    <!-- Target for toggling the sidebar `.sidebar-checkbox` is for regular
+     styles, `#sidebar-checkbox` for behavior. -->
+<input type="checkbox" class="sidebar-checkbox" id="sidebar-checkbox">
+
+<!-- Toggleable sidebar -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-item">
+    <p>I am a recent Graduate from the University of Maine with a Professional Science Master's in Bioinformatics.</p>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a class="sidebar-nav-item" href=/>Home</a>
+
+    
+
+    
+    
+      
+    
+      
+    
+      
+        
+          <a class="sidebar-nav-item" href="/about/">About Me</a>
+        
+      
+    
+      
+    
+      
+        
+          <a class="sidebar-nav-item" href="/blog.html">Blog</a>
+        
+      
+    
+      
+        
+          <a class="sidebar-nav-item" href="/contact/">Contact Me</a>
+        
+      
+    
+      
+        
+          <a class="sidebar-nav-item" href="/current_resume/">Current Resume</a>
+        
+      
+    
+      
+    
+      
+    
+      
+    
+  </nav>
+
+  <div class="sidebar-item">
+    <p>
+      &copy; 2019. All rights reserved.
+    </p>
+  </div>
+</div>
+
+
+    <!-- Wrap is the content to shift when toggling the sidebar. We wrap the
+         content to avoid any CSS collisions with our real content. -->
+    <div class="wrap">
+      <div class="masthead">
+        <div class="container">
+          <h3 class="masthead-title">
+            <a href=/ title="Home">Nathan's Personal Website</a>
+            <small></small>
+          </h3>
+        </div>
+      </div>
+
+      <div class="container content">
+        <div class="page">
+  <h1 class="page-title">Archiving Text in DNA part 1 - Archiving</h1>
+  <p><a id="top"></a>During my digital preservation class in my final semester of graduate school the topic using DNA as an 
+archival medium for digital objects arose for discussion.  Apparently this has already been done.  One 
+of the first attempts being the archival of text within the a strand of DNA and the successful 
+retrieval of the text from the DNA strand.  There are many benefits of this strategy. 
+The most obvious being that if successful the archive could potentially last for thousands of years 
+(as long as the DNA does denature).</p>
+
+<p>Before jumping on the bandwagon I decided to try this out for myself.  What better way to learn about 
+the benefits and flaws of an archival strategy than to get down and dirty and simply try 
+using it?  And what better language than Python for parsing and string and list manipulation?<br />
+In this post my goal was to simply store a text file in a strand of DNA.  I have no idea how those 
+before me went about achieving this but here is with what I came up.</p>
+
+<p>First I had to import a couple of libraries that I would need and then open a read file and a write file.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import binascii
+from textwrap import wrap
+
+infile = raw_input("Please enter the file you would like to archive: ")
+out = raw_input("Please enter a name for the archived file: ")
+outfile = open(out, "w")
+with open(infile, "r") as myfile:
+    f = myfile.readlines()
+</code></pre></div></div>
+<p>The next step would be to convert the text file into a bitstream.  To do this I had to first perform
+a hexdump and then convert the base 16 hexdump to binary base 2.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>numeric = int(hexdump, 16)
+binary = format(numeric, "b")
+</code></pre></div></div>
+<p>Knowing that I was working with a total of four nucleotides I decided to split the bitstream into
+into a list where every element consisted of two numbers.  This left four possible combinations (00, 
+01, 10 or 11).</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>code = wrap(binary, 2)
+</code></pre></div></div>
+
+<p>Now I could assign a nucleotide to each one of these number combinations and begin constructing 
+the DNA sequence in the form of a list.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>DNA = []
+for i in code:
+    if i == "00":
+        DNA.append("A")
+    elif i == "01":
+        DNA.append("C")
+    elif i == "10":
+        DNA.append("G")
+    elif i == "11":
+        DNA.append("T")
+</code></pre></div></div>
+
+<p>Great.  But what happens when the bitstream has an odd number of characters?  Then the last bit could 
+be either a 1 or a 0 instead of the assigned combinations.  In this case a appended a long string 
+of A’s to a value of 0 and a long string of T’s to a value of 1.  (I will show what to do with 
+these tails in Part 2 where I tried to translate back to the original text.)</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   elif i == "0":
+        DNA.append("AAAAAAAAAAAAAAAAAAAA")
+    else:
+        DNA.append("TTTTTTTTTTTTTTTTTTTT")
+</code></pre></div></div>
+
+<p>Next I converted the list of nucleotides to a DNA string and wrote the string to a file.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>storage_code = "".join(DNA)
+outfile.write(storage_code)
+outfile.close()
+</code></pre></div></div>
+<p>Here is the script in its entirety.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import binascii
+from textwrap import wrap
+
+infile = raw_input("Please enter the file you would like to archive: ")
+out = raw_input("Please enter a name for the archived file: ")
+outfile = open(out, "w")
+with open(infile, "r") as myfile:
+    f = myfile.readlines()
+
+dump = " ".join(f)
+hexdump = binascii.hexlify(dump)
+
+numeric = int(hexdump, 16)
+binary = format(numeric, "b")
+code = wrap(binary, 2)
+
+DNA = []
+for i in code:
+    if i == "00":
+        DNA.append("A")
+    elif i == "01":
+        DNA.append("C")
+    elif i == "10":
+        DNA.append("G")
+    elif i == "11":
+        DNA.append("T")
+    elif i == "0":
+        DNA.append("AAAAAAAAAAAAAAAAAAAA")
+    else:
+        DNA.append("TTTTTTTTTTTTTTTTTTTT")
+storage_code = "".join(DNA)
+outfile.write(storage_code)
+outfile.close()
+</code></pre></div></div>
+
+<p>If we try it with a text file containing “Hello World!” we get this.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>GAGCAGACGCCCGTACGTACGTTAGAACCCTCGTTCTAGCGTACGCAAGACAGAGAAGG
+</code></pre></div></div>
+<p>Okay.  Now try it with the complete text of Romeo and Juliet downloaded from Project Gutenberg in 
+text format.  Let it run for about two or three hours and the play will be archived in DNA strand whose
+length is over 300,000 nucleotides long after two or three hours.</p>
+
+<p>The point here is that although it might work, for anything larger than a simple message the conversion
+is incredibly inefficient.  Not to mention that at this point we don’t know if we can get the original
+text back and if the information cannot be found then the information was never really archived.  More 
+on this in part two where I attempted to bring back the original from the DNA strand.</p>
+
+<p><a href="/blog.html">back to blog</a>  <a href="#top">back to top</a></p>
+
+</div>
+
+      </div>
+    </div>
+
+    <label for="sidebar-checkbox" class="sidebar-toggle"></label>
+
+    <script>
+      (function(document) {
+        var toggle = document.querySelector('.sidebar-toggle');
+        var sidebar = document.querySelector('#sidebar');
+        var checkbox = document.querySelector('#sidebar-checkbox');
+
+        document.addEventListener('click', function(e) {
+          var target = e.target;
+
+          if(!checkbox.checked ||
+             sidebar.contains(target) ||
+             (target === checkbox || target === toggle)) return;
+
+          checkbox.checked = false;
+        }, false);
+      })(document);
+    </script>
+  </body>
+</html>
