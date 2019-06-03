@@ -183,14 +183,14 @@ final_binary = nucl + binarytail
 bitstream = "".join(final_binary)
 </code></pre></div></div>
 
-<p>We begin by building the nucl list in the for loop.  Once this list built we test the length of the list.  If the length is greater than 20 
+<p>We begin by building the nucl list in the for loop.  Once this list is built we test the length of the list.  If the length is greater than 20 
 we know that the list is long enough to potentially contain that string of twenty A's or T's that would have been appended from the previous script
 for the trailing single binary digit.  So we use another for loop to pop the last twenty entries in the nucl list into a new list called nucltail.
 Next we test the values in the nucltail list and append them to testAlength, testTlength or no list at all.  While this is happening we send what is
-left of the nucl to our defined binarybuilder function from earlier to begin generating the pairs of binary digits representing the nucleotides in 
+left of the nucl to our defined binarybuilder function from earlier to begin generating the pairs of binary digits representing the nucleotides in the 
 DNA strand.  Next we test the length of the testAlength and testTlength lists.  If either length is equal to twenty we know that the tail is the string of 
 twenty A's or T's that represented the single binary digit.  If the length of both lists is less than twenty we send the binarytail list to the binarybuilder
-function.  Finally we combine the nucl and nucltail lists into a final list and convert them to a string.</p>
+function.  Finally we combine the nucl and binarytail lists into a final list and convert them to a string.</p>
 
 <p>Almost there.  Next we need to convert the binary string to hexadecimal then to the original text and write the output.  Let's look at the following.</p>
 
@@ -268,7 +268,7 @@ outfile.write(text)
 outfile.close()
 </code></pre></div></div>
 
-<p>There you have it.  This should work with any ascii format.  However I have only tested it on two Shakespearian plays.  The hash for the 
+<p>There you have it.  This should work with any ascii format.  However I have only tested it on two Shakespearean plays.  The hash for the 
 beginning file and the end file will not be the same but the actual converted text will be the same.  There is probably a much better way to 
 do this and I would love to hear about it.  This is what I came up with though.  Happy coding!</p>
 
