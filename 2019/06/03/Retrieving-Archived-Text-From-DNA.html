@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+  <head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>
+    
+      Archiving Text in DNA part 2 - Retrieval &middot; Nathan's Personal Website
+    
+  </title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href=/assets/css/styles.css>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Serif:400,400italic,700%7CPT+Sans:400">
+
+  <!-- Icons -->
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href=/assets/apple-touch-icon-precomposed.png>
+  <link rel="shortcut icon" href=/assets/favicon.ico>
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="Nathan&#39;s Personal Website" href="/feed.xml">
+</head>
+
+
+  <body>
+
+    <!-- Target for toggling the sidebar `.sidebar-checkbox` is for regular
+     styles, `#sidebar-checkbox` for behavior. -->
+<input type="checkbox" class="sidebar-checkbox" id="sidebar-checkbox">
+
+<!-- Toggleable sidebar -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-item">
+    <p>I am a recent Graduate from the University of Maine with a Professional Science Master's in Bioinformatics.</p>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a class="sidebar-nav-item" href=/>Home</a>
+
+    
+
+    
+    
+      
+    
+      
+    
+      
+        
+          <a class="sidebar-nav-item" href="/about/">About Me</a>
+        
+      
+    
+      
+    
+      
+        
+          <a class="sidebar-nav-item" href="/blog.html">Blog</a>
+        
+      
+    
+      
+        
+          <a class="sidebar-nav-item" href="/contact/">Contact Me</a>
+        
+      
+    
+      
+        
+          <a class="sidebar-nav-item" href="/current_resume/">Current Resume</a>
+        
+      
+    
+      
+    
+      
+    
+      
+    
+  </nav>
+
+  <div class="sidebar-item">
+    <p>
+      &copy; 2019. All rights reserved.
+    </p>
+  </div>
+</div>
+
+
+    <!-- Wrap is the content to shift when toggling the sidebar. We wrap the
+         content to avoid any CSS collisions with our real content. -->
+    <div class="wrap">
+      <div class="masthead">
+        <div class="container">
+          <h3 class="masthead-title">
+            <a href=/ title="Home">Nathan's Personal Website</a>
+            <small></small>
+          </h3>
+        </div>
+      </div>
+
+      <div class="container content">
+        <div class="page">
+  <h1 class="page-title">Archiving Text in DNA part 2 - Retrieval</h1>
+  <p><a id="top"></a>From the previous post we now have the ability to convert simple text documents to strands of DNA.
+But is the text really archived?  Are we able to retrieve it to its original state?  The answer is yes and the answer is no.
+Yes in the sense that the text is recovered and reads the same as the original.  If we create a hash for the original file and
+a hash for the retrieved file the answer is no.  This appears to be mostly due to spacing.  However for all intents and purposes the 
+following script will allow us to retrieve the essence of the file we originally archived in the DNA.  Let's look at the script</p>
+
+<p>In the most basic sense we should attempt to reverse the archival script to retrieve the text but this proves to be a little more
+complicated.  First let's import our libraries and open our files for reading and writing.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import binascii
+
+infile = raw_input("Enter the name of the file containing the nucleotide sequence to be translated: ")
+out = raw_input("Enter the name of the new text file where you want to store the translated text: ")
+outfile = open(out, "w")
+with open(infile, "r") as myfile:
+    f = myfile.readlines()
+sequence = "".join(f)
+</code></pre></div></div>
+
+<p>For this script we will need to define a function to retrieve the binary sequence from the DNA string.  We can call it binarybuilder.
+This function is very similar to the part of the script we used in archiving.  We will call on this function later in the script.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>        
+def binarybuilder(sequences):
+    binary = []
+    for i in nucl:
+        if i == "A":
+            binary.append("00")
+        elif i == "C":
+            binary.append("01")
+        elif i == "G":
+            binary.append("10")
+        elif i == "T":
+            binary.append("11")
+    return binary
+</code></pre></div></div>
+
+<p>Next we will declare a set of empty lists that we can append to.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+nucl = []
+binarytail = []
+testAlength = []
+testTlength = []
+</code></pre></div></div>
+
+<p>Remember from the previous script how we dealt with a single binary digit on the tail of our string?  I also mentioned we would have to deal
+with it in this script.  Here is where we deal with it.  Take a look at the following</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+for nucleotide in sequence:
+    nucl.append(nucleotide)
+
+if len(nucl) > 20:
+    nucltail = [nucl.pop() for idx in range(20)]
+    for i in nucltail:
+        if i == "A":
+            testAlength.append("A")
+        elif i == "T":
+            testTlength.append("T")
+
+nucl = binarybuilder(nucl)
+
+if len(testAlength) == 20:
+    binarytail.append("0")
+elif len(testTlength) == 20:
+    binarytail.append("1")
+else:
+    binarytail = binarybuilder(nucltail)
+
+final_binary = nucl + binarytail
+bitstream = "".join(final_binary)
+</code></pre></div></div>
+
+<p>We begin by building the nucl list in the for loop.  Once this list built we test the length of the list.  If the length is greater than 20 
+we know that the list is long enough to potentially contain that string of twenty A's or T's that would have been appended from the previous script
+for the trailing single binary digit.  So we use another for loop to pop the last twenty entries in the nucl list into a new list called nucltail.
+Next we test the values in the nucltail list and append them to testAlength, testTlength or no list at all.  While this is happening we send what is
+left of the nucl to our defined binarybuilder function from earlier to begin generating the pairs of binary digits representing the nucleotides in 
+DNA strand.  Next we test the length of the testAlength and testTlength lists.  If either length is equal to twenty we know that the tail is the string of 
+twenty A's or T's that represented the single binary digit.  If the length of both lists is less than twenty we send the binarytail list to the binarybuilder
+function.  Finally we combine the nucl and nucltail lists into a final list and convert them to a string.</p>
+
+<p>Almost there.  Next we need to convert the binary string to hexadecimal then to the original text and write the output.  Let's look at the following.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+numeric = int(bitstream, 2)
+try:
+    text = binascii.unhexlify('%x' % numeric)
+except:
+    text = binascii.unhexlify('0%x' % numeric)
+outfile.write(text)
+outfile.close()
+</code></pre></div></div> 
+
+<p>For this to work we need to introduce exception handling.  If the string is of an odd length the unhexlify command will fail.  So we try to unhexlify and 
+if this throws an error we pad the string with a zero to change the length of the string by one.  Then write and close the files.  Here is the script in its
+entirety.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import binascii
+
+infile = raw_input("Enter the name of the file containing the nucleotide sequence to be translated: ")
+out = raw_input("Enter the name of the new text file where you want to store the translated text: ")
+outfile = open(out, "w")
+with open(infile, "r") as myfile:
+    f = myfile.readlines()
+sequence = "".join(f)
+
+def binarybuilder(sequences):
+    binary = []
+    for i in nucl:
+        if i == "A":
+            binary.append("00")
+        elif i == "C":
+            binary.append("01")
+        elif i == "G":
+            binary.append("10")
+        elif i == "T":
+            binary.append("11")
+    return binary
+
+nucl = []
+binarytail = []
+testAlength = []
+testTlength = []
+
+for nucleotide in sequence:
+    nucl.append(nucleotide)
+
+if len(nucl) > 20:
+    nucltail = [nucl.pop() for idx in range(20)]
+    for i in nucltail:
+        if i == "A":
+            testAlength.append("A")
+        elif i == "T":
+            testTlength.append("T")
+
+nucl = binarybuilder(nucl)
+
+if len(testAlength) == 20:
+    binarytail.append("0")
+elif len(testTlength) == 20:
+    binarytail.append("1")
+else: 
+    binarytail = binarybuilder(nucltail)
+
+final_binary = nucl + binarytail
+bitstream = "".join(final_binary)
+
+numeric = int(bitstream, 2)
+try:
+    text = binascii.unhexlify('%x' % numeric)
+except:
+    text = binascii.unhexlify('0%x' % numeric)
+outfile.write(text)
+outfile.close()
+</code></pre></div></div>
+
+<p>There you have it.  This should work with any ascii format.  However I have only tested it on two Shakespearian plays.  The hash for the 
+beginning file and the end file will not be the same but the actual converted text will be the same.  There is probably a much better way to 
+do this and I would love to hear about it.  This is what I came up with though.  Happy coding!</p>
+
+<p><a href="/blog.html">back to blog</a>  <a href="#top">back to top</a></p>
+
+</div>
+
+      </div>
+    </div>
+
+    <label for="sidebar-checkbox" class="sidebar-toggle"></label>
+
+    <script>
+      (function(document) {
+        var toggle = document.querySelector('.sidebar-toggle');
+        var sidebar = document.querySelector('#sidebar');
+        var checkbox = document.querySelector('#sidebar-checkbox');
+
+        document.addEventListener('click', function(e) {
+          var target = e.target;
+
+          if(!checkbox.checked ||
+             sidebar.contains(target) ||
+             (target === checkbox || target === toggle)) return;
+
+          checkbox.checked = false;
+        }, false);
+      })(document);
+    </script>
+  </body>
+</html>
