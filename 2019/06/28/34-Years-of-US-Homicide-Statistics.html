@@ -364,8 +364,10 @@ def perp_vs_vict(df_nation, df_maine):
 
 #Age Statistics Table
     print('{: >45}'.format("Homicide Age Statistics"))
-    print(pd.concat([df_nation.describe().round(2), df_maine.describe().round(2)], 
-                    keys = ['National Statistics','Maine Statistics'], axis = 1))
+    print(pd.concat([df_nation.describe().round(2), 
+                     df_maine.describe().round(2)], 
+                     keys = ['National Statistics',
+                     'Maine Statistics'], axis = 1))
 
 def weapons(df_nation, df_maine):
 
@@ -402,9 +404,9 @@ def weapons(df_nation, df_maine):
 
 def months(df_nation, df_maine):
 
-    categories = ['January', 'February', 'March', 'April', 'May', 'June', 
-                  'July', 'August', 'September', 'October','November', 
-                  'December']
+    categories = ['January', 'February', 'March', 'April', 'May', 
+                  'June', 'July', 'August', 'September', 'October',
+                  'November', 'December']
     x = np.arange(12)
     nseason = pd.Categorical(df_nation['Month'], categories)
     mseason = pd.Categorical(df_maine['Month'], categories)
@@ -416,7 +418,8 @@ def months(df_nation, df_maine):
     myear_per = myear / len(df_maine) * 100
 
 #Total Homicides by Year
-    nyear_per.plot(label = 'National', color = 'blue', figsize = (13, 6.5))
+    nyear_per.plot(label = 'National', color = 'blue', 
+                   figsize = (13, 6.5))
     myear_per.plot(label = 'Maine', color = 'green')
     plt.title('Percentage of Total Homicides by Year')
     plt.ylabel('Percent')
@@ -425,15 +428,20 @@ def months(df_nation, df_maine):
     plt.show()
 
 #Months Pie Plots
-    fig1 , ax1 = plt.subplots(ncols = 2, nrows = 1, figsize = (13, 6.5))
-    explode = (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0)
-    ax1[0].pie(np.array(nseason_freq), labels = categories, shadow = True, 
-               startangle = 90, autopct = '%1.1f%%', explode = explode)
+    fig1 , ax1 = plt.subplots(ncols = 2, nrows = 1, 
+                             figsize = (13, 6.5))
+    explode = (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 
+               0.0, 0.0, 0.0, 0.0)
+    ax1[0].pie(np.array(nseason_freq), labels = categories, 
+               shadow = True, startangle = 90, autopct = '%1.1f%%', 
+               explode = explode)
     ax1[0].axis('equal')
     ax1[0].set_title('National Percent of Total Homicides by Month')
-    explode = (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0)
-    ax1[1].pie(np.array(mseason_freq), labels = categories, shadow = True, 
-               startangle = 90, autopct = '%1.1f%%', explode = explode)
+    explode = (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 
+               0.0)
+    ax1[1].pie(np.array(mseason_freq), labels = categories, 
+               shadow = True, startangle = 90, autopct = '%1.1f%%', 
+               explode = explode)
     ax1[1].axis('equal')
     ax1[1].set_title('Maine Percent of Total Homicides by Month')
     plt.show()
@@ -469,7 +477,8 @@ del df['City']
 del df['Victim Race']
 del df['Crime Type']
 df.to_csv('database_v2.csv', encoding = 'UTF-8')
-df = pd.read_csv('database_v2.csv',index_col = 0, low_memory = False)
+df = pd.read_csv('database_v2.csv',index_col = 0, 
+                 low_memory = False)
 df.set_index('Year', inplace = True)
 df = df.replace('Unknown', np.NaN)
 df = df.replace(0, np.NaN)
@@ -479,26 +488,32 @@ df = df[ df['Perpetrator Age'] < 123]
 df = df[ df['Perpetrator Age'] > 5]
 df = df[df['Victim Age'] < 123]
 df = df[df['Victim Age'] > 0]
-df['Weapon'] = df['Weapon'].replace(('Handgun', 'Shotgun', 'Gun', 'Rifle'), 
-                  'Firearm')
-df['Weapon'] = df['Weapon'].replace(('Drowning', 'Fall'), 'Drowning or Fall')
-df['Weapon'] = df['Weapon'].replace(('Explosives', 'Fire'), 'Explosives or Fire')
-df['Weapon'] = df['Weapon'].replace(('Poison', 'Drugs'), 'Poison or Drugs')
-df['Weapon'] = df['Weapon'].replace(('Strangulation', 'Suffocation'), 
-                  'Asphyxiation')
+df['Weapon'] = df['Weapon'].replace(('Handgun', 'Shotgun', 
+                  'Gun', 'Rifle'), 'Firearm')
+df['Weapon'] = df['Weapon'].replace(('Drowning', 'Fall'), 
+                  'Drowning or Fall')
+df['Weapon'] = df['Weapon'].replace(('Explosives', 'Fire'), 
+                  'Explosives or Fire')
+df['Weapon'] = df['Weapon'].replace(('Poison', 'Drugs'), 
+                  'Poison or Drugs')
+df['Weapon'] = df['Weapon'].replace(('Strangulation', 
+                  'Suffocation'), 'Asphyxiation')
 df_nation = df
 df_maine = df[df_nation['State'] == 'Maine']
 
 #User Interface
-print("This program provides an analysis of Homicide Data collected from 
-      1980 - 2014")
+print("This program provides an analysis of Homicide Data 
+       collected from 1980 - 2014")
 resp = 'y'
 while resp[0] == 'y':
     print("Please choose from the following options.")
     print()
-    print("Enter 1 to view analysis of Perpetrator and Victim Ages.")
-    print("Enter 2 to view an analysis Weapons Used.")
-    print("Enter 3 to view an analysis homicides by year and month.")
+    print("Enter 1 to view analysis of Perpetrator and 
+          Victim Ages.")
+    print("Enter 2 to view an analysis Weapons 
+          Used.")
+    print("Enter 3 to view an analysis homicides by year 
+          and month.")
     print()
     choice = input("Which option do you choose?: ")
     if choice == '1':
@@ -511,9 +526,11 @@ while resp[0] == 'y':
         print("You must enter a number from 1 to 3.")
         resp = 'y'
     print()
-    resp = input("Would you like to view more Homicide Analysis? y/n: ").lower()
+    resp = input("Would you like to view more Homicide 
+                 Analysis? y/n: ").lower()
     while resp[0] != 'y' and resp[0] != 'n':
-        resp = input("Please enter y or n to continue: ").lower()
+        resp = input("Please enter y or n to 
+                     continue: ").lower()
 print("Thanks for watching")
 
 </code></pre></div></div>
