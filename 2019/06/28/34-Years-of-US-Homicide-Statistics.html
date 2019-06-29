@@ -289,18 +289,23 @@ def perp_vs_vict(df_nation, df_maine):
 
 #Age Boxplots
     boxes = [nperp_age, mperp_age, nvict_age, mvict_age]
-    labels = ['National Perpetrator', 'Maine Perpetrator', 'National Victim', 'Maine Victim']
+    labels = ['National Perpetrator', 'Maine Perpetrator', 
+              'National Victim', 'Maine Victim']
     fig = plt.figure(figsize = (13, 6.5))
-    plt.boxplot(boxes, labels = labels, patch_artist = True, showfliers = False, medianprops = dict(linewidth=1,
+    plt.boxplot(boxes, labels = labels, patch_artist = True, 
+                showfliers = False, medianprops = dict(linewidth=1,
                 color = 'black'))
-    plt.title('Boxplots of Perpetrator and Victim Ages (outliers removed)')
+    plt.title('Boxplots of Perpetrator and Victim Ages 
+              (outliers removed)')
     plt.ylabel('Age')
     plt.show()
 
 #Age Histograms with Fitted Gaussian Distribution
-    fig1, axes = plt.subplots(nrows = 2, ncols = 2, tight_layout = True, figsize = (13, 6.5))
+    fig1, axes = plt.subplots(nrows = 2, ncols = 2, tight_layout = True, 
+                             figsize = (13, 6.5))
     bins = 50
-    n, bins, patches = axes[0, 0].hist(np.array(nperp_age), bins, density = True, color = 'blue')
+    n, bins, patches = axes[0, 0].hist(np.array(nperp_age), bins, 
+                                       density = True, color = 'blue')
     (mu, sigma) = scipy.stats.norm.fit(nperp_age)
     y = scipy.stats.norm.pdf(bins, mu, sigma)
     axes[0, 0].plot(bins, y, 'k--', linewidth = 2)
@@ -308,7 +313,8 @@ def perp_vs_vict(df_nation, df_maine):
     axes[0, 0].set_ylabel('Frequency')
     axes[0, 0].set_xlabel('Age')
 
-    n, bins, patches = axes[0,1].hist(np.array(mperp_age), bins, density = True, color = 'green')
+    n, bins, patches = axes[0,1].hist(np.array(mperp_age), bins, 
+                                      density = True, color = 'green')
     (mu, sigma) = scipy.stats.norm.fit(mperp_age)
     y = scipy.stats.norm.pdf(bins, mu, sigma)
     axes[0, 1].plot(bins, y, 'k--', linewidth = 2)
@@ -316,7 +322,8 @@ def perp_vs_vict(df_nation, df_maine):
     axes[0, 1].set_ylabel('Frequency')
     axes[0, 1].set_xlabel('Age')
 
-    n, bins, patches = axes[1, 0].hist(np.array(nvict_age), bins, density = True, color = 'red')
+    n, bins, patches = axes[1, 0].hist(np.array(nvict_age), bins, 
+                                       density = True, color = 'red')
     (mu, sigma) = scipy.stats.norm.fit(nvict_age)
     y = scipy.stats.norm.pdf(bins, mu, sigma)
     axes[1, 0].plot(bins, y, 'k--', linewidth = 2)
@@ -324,7 +331,8 @@ def perp_vs_vict(df_nation, df_maine):
     axes[1, 0].set_ylabel('Frequency')
     axes[1, 0].set_xlabel('Age')
 
-    n, bins, patches = axes[1, 1].hist(np.array(mvict_age), bins, density = True, color = 'orange')
+    n, bins, patches = axes[1, 1].hist(np.array(mvict_age), bins, 
+                                       density = True, color = 'orange')
     (mu, sigma) = scipy.stats.norm.fit(mvict_age)
     y = scipy.stats.norm.pdf(bins, mu, sigma)
     axes[1, 1].plot(bins, y, 'k--', linewidth = 2)
@@ -356,8 +364,8 @@ def perp_vs_vict(df_nation, df_maine):
 
 #Age Statistics Table
     print('{: >45}'.format("Homicide Age Statistics"))
-    print(pd.concat([df_nation.describe().round(2), df_maine.describe().round(2)], keys = ['National Statistics',
-                        'Maine Statistics'], axis = 1))
+    print(pd.concat([df_nation.describe().round(2), df_maine.describe().round(2)], 
+                    keys = ['National Statistics','Maine Statistics'], axis = 1))
 
 def weapons(df_nation, df_maine):
 
@@ -369,8 +377,8 @@ def weapons(df_nation, df_maine):
 #Weapons Barplot
     bars = [n_weap_freq, m_weap_freq]
     x = np.arange(7)
-    labels = ['Asphyxiation', 'Blunt Object', 'Drowning or Fall', 'Explosives or Fire', 'Firearm', 'Knife',
-              'Poison or Drugs']
+    labels = ['Asphyxiation', 'Blunt Object', 'Drowning or Fall', 
+              'Explosives or Fire', 'Firearm', 'Knife', 'Poison or Drugs']
     fig = plt.figure(figsize = (13, 6.5))
     plt.bar(x - 0.2, bars[0], color = 'blue', width = 0.4, label = 'National')
     plt.bar(x + 0.2, bars[1], color = 'green', width = 0.4, label = 'Maine')
@@ -379,8 +387,9 @@ def weapons(df_nation, df_maine):
     plt.ylabel('% of Homicides')
     plt.xlabel('Weapons Used')
     plt.title('Weapons Used in Homicides')
-    plt.annotate('Firearms are the most popular weapons', xy = (4, 60), xytext = (0, 35),
-                 arrowprops = dict(facecolor = 'black', shrink = 0.2))
+    plt.annotate('Firearms are the most popular weapons', xy = (4, 60), 
+                 xytext = (0, 35), arrowprops = dict(facecolor = 'black', 
+                 shrink = 0.2))
     plt.tight_layout()
     plt.show()
 
@@ -388,12 +397,14 @@ def weapons(df_nation, df_maine):
     print()
     print('{:>38}'.format("Percentage of Total Homicides by Weapon"))
     print()
-    print(pd.concat([n_weap_freq.round(2), m_weap_freq.round(2)], keys = ['National %', 'Maine %'], axis = 1))
+    print(pd.concat([n_weap_freq.round(2), m_weap_freq.round(2)], 
+                    keys = ['National %', 'Maine %'], axis = 1))
 
 def months(df_nation, df_maine):
 
-    categories = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October',
-                  'November', 'December']
+    categories = ['January', 'February', 'March', 'April', 'May', 'June', 
+                  'July', 'August', 'September', 'October','November', 
+                  'December']
     x = np.arange(12)
     nseason = pd.Categorical(df_nation['Month'], categories)
     mseason = pd.Categorical(df_maine['Month'], categories)
@@ -416,13 +427,13 @@ def months(df_nation, df_maine):
 #Months Pie Plots
     fig1 , ax1 = plt.subplots(ncols = 2, nrows = 1, figsize = (13, 6.5))
     explode = (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0)
-    ax1[0].pie(np.array(nseason_freq), labels = categories, shadow = True, startangle = 90,
-            autopct = '%1.1f%%', explode = explode)
+    ax1[0].pie(np.array(nseason_freq), labels = categories, shadow = True, 
+               startangle = 90, autopct = '%1.1f%%', explode = explode)
     ax1[0].axis('equal')
     ax1[0].set_title('National Percent of Total Homicides by Month')
     explode = (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0)
-    ax1[1].pie(np.array(mseason_freq), labels = categories, shadow = True, startangle = 90,
-               autopct = '%1.1f%%', explode = explode)
+    ax1[1].pie(np.array(mseason_freq), labels = categories, shadow = True, 
+               startangle = 90, autopct = '%1.1f%%', explode = explode)
     ax1[1].axis('equal')
     ax1[1].set_title('Maine Percent of Total Homicides by Month')
     plt.show()
@@ -431,11 +442,13 @@ def months(df_nation, df_maine):
     print()
     print("Percent of Total Homicides by Year")
     print()
-    print(pd.concat([nyear_per.round(2), myear_per.round(2)], keys = ['National %', 'Maine %'], axis = 1))
+    print(pd.concat([nyear_per.round(2), myear_per.round(2)], 
+                    keys = ['National %', 'Maine %'], axis = 1))
     print()
     print("Percent of Total Homicides by Month")
     print()
-    print(pd.concat([nseason_freq.round(2), mseason_freq.round(2)], keys = ['National %', 'Maine %'], axis = 1))
+    print(pd.concat([nseason_freq.round(2), mseason_freq.round(2)], 
+                    keys = ['National %', 'Maine %'], axis = 1))
 
 
 #Clean data resulting in two dataframes
@@ -466,16 +479,19 @@ df = df[ df['Perpetrator Age'] < 123]
 df = df[ df['Perpetrator Age'] > 5]
 df = df[df['Victim Age'] < 123]
 df = df[df['Victim Age'] > 0]
-df['Weapon'] = df['Weapon'].replace(('Handgun', 'Shotgun', 'Gun', 'Rifle'), 'Firearm')
+df['Weapon'] = df['Weapon'].replace(('Handgun', 'Shotgun', 'Gun', 'Rifle'), 
+                  'Firearm')
 df['Weapon'] = df['Weapon'].replace(('Drowning', 'Fall'), 'Drowning or Fall')
 df['Weapon'] = df['Weapon'].replace(('Explosives', 'Fire'), 'Explosives or Fire')
 df['Weapon'] = df['Weapon'].replace(('Poison', 'Drugs'), 'Poison or Drugs')
-df['Weapon'] = df['Weapon'].replace(('Strangulation', 'Suffocation'), 'Asphyxiation')
+df['Weapon'] = df['Weapon'].replace(('Strangulation', 'Suffocation'), 
+                  'Asphyxiation')
 df_nation = df
 df_maine = df[df_nation['State'] == 'Maine']
 
 #User Interface
-print("This program provides an analysis of Homicide Data collected from 1980 - 2014")
+print("This program provides an analysis of Homicide Data collected from 
+      1980 - 2014")
 resp = 'y'
 while resp[0] == 'y':
     print("Please choose from the following options.")
