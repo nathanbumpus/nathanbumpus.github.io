@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+  <head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>
+    
+      From Raw Reads To HTSeq Counts Files in Command Line - Retrieval &middot; Nathan's Personal Website
+    
+  </title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href=/assets/css/styles.css>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Serif:400,400italic,700%7CPT+Sans:400">
+
+  <!-- Icons -->
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href=/assets/apple-touch-icon-precomposed.png>
+  <link rel="shortcut icon" href=/assets/favicon.ico>
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="Nathan&#39;s Personal Website" href="/feed.xml">
+</head>
+
+
+  <body>
+
+    <!-- Target for toggling the sidebar `.sidebar-checkbox` is for regular
+     styles, `#sidebar-checkbox` for behavior. -->
+<input type="checkbox" class="sidebar-checkbox" id="sidebar-checkbox">
+
+<!-- Toggleable sidebar -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-item">
+    <p>I am a recent Graduate from the University of Maine with a Professional Science Master's in Bioinformatics.</p>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a class="sidebar-nav-item" href=/>Home</a>
+
+    
+
+    
+    
+      
+    
+      
+    
+      
+        
+          <a class="sidebar-nav-item" href="/about/">About Me</a>
+        
+      
+    
+      
+    
+      
+        
+          <a class="sidebar-nav-item" href="/blog.html">Blog</a>
+        
+      
+    
+      
+        
+          <a class="sidebar-nav-item" href="/contact/">Contact Me</a>
+        
+      
+    
+      
+        
+          <a class="sidebar-nav-item" href="/current_resume/">Current Resume</a>
+        
+      
+    
+      
+    
+      
+    
+      
+    
+  </nav>
+
+  <div class="sidebar-item">
+    <p>
+      &copy; 2019. All rights reserved.
+    </p>
+  </div>
+</div>
+
+
+    <!-- Wrap is the content to shift when toggling the sidebar. We wrap the
+         content to avoid any CSS collisions with our real content. -->
+    <div class="wrap">
+      <div class="masthead">
+        <div class="container">
+          <h3 class="masthead-title">
+            <a href=/ title="Home">Nathan's Personal Website</a>
+            <small></small>
+          </h3>
+        </div>
+      </div>
+
+      <div class="container content">
+        <div class="page">
+  <h1 class="page-title">From Raw Reads to HTSeq Counts Files in Command Line</h1>
+    <p><a id="top"></a>Here is part one of a two part series focussing on using raw RNA seq reads deposited in the NCBI SRA database
+       to perform Differential expression analysis between groups of replicates.  This first part focusses on using the command line to 
+       obtain raw RNA seq data, clean the data and generate HTSeq counts files.  The second part of this series will focus on using the 
+       R package DESeq2 to generate a counts matrix and samples table used to perform Differential Expression Analysis.  The data for this 
+       are located at NCBI under bioproject number PRJNA433234.  
+       The paper using this data is located <a href="https://www.nature.com/articles/s41588-018-0252-3" target="_blank">here</a>.</p>
+
+    <p>First write a script to download the raw RNA seq reads using the SRA toolkit.  Here is mine.</p>
+
+div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+#!/bin/bash -l
+#PBS -q haswell
+#PBS -N sradownload
+#PBS -l nodes=1:ppn=1
+#PBS -l walltime=05:00:00
+#PBS -o out.txt
+#PBS -e err.txt
+
+cd /home/nbumpus/sratoolkit.2.9.4-1-ubuntu64/bin/
+
+./prefetch.2.9.4 -v SRR6677976
+./prefetch.2.9.4 -v SRR6677977
+./prefetch.2.9.4 -v SRR6677978
+./prefetch.2.9.4 -v SRR6677979
+./prefetch.2.9.4 -v SRR6677980
+./prefetch.2.9.4 -v SRR6677981
+</code></pre></div></div>
+
+    <p>Next write a script to split the SRA files into left and right reads.
+
+div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+#!/bin/bash -l
+#PBS -q haswell
+#PBS -N splitsra
+#PBS -l nodes=1:ppn=1
+#PBS -l walltime=05:00:00
+#PBS -o out.txt
+#PBS -e err.txt
+
+cd /home/nbumpus/sratoolkit.2.9.4-1-ubuntu64/bin/
+
+./fastq-dump.2.9.4 --outdir /home/nbumpus/raw_reads/ \
+--defline-seq '@$sn[_$rn]/$ri' --split-files /home/nbumpus/ncbi/public/sra/SRR6677976.sra
+./fastq-dump.2.9.4 --outdir /home/nbumpus/raw_reads/ \
+--defline-seq '@$sn[_$rn]/$ri' --split-files /home/nbumpus/ncbi/public/sra/SRR6677977.sra
+./fastq-dump.2.9.4 --outdir /home/nbumpus/raw_reads/ \
+--defline-seq '@$sn[_$rn]/$ri' --split-files /home/nbumpus/ncbi/public/sra/SRR6677978.sra
+./fastq-dump.2.9.4 --outdir /home/nbumpus/raw_reads/ \
+--defline-seq '@$sn[_$rn]/$ri' --split-files /home/nbumpus/ncbi/public/sra/SRR6677979.sra
+./fastq-dump.2.9.4 --outdir /home/nbumpus/raw_reads/ \
+--defline-seq '@$sn[_$rn]/$ri' --split-files /home/nbumpus/ncbi/public/sra/SRR6677980.sra
+./fastq-dump.2.9.4 --outdir /home/nbumpus/raw_reads/ \
+--defline-seq '@$sn[_$rn]/$ri' --split-files /home/nbumpus/ncbi/public/sra/SRR6677981.sra    
+</code></pre></div></div>
+
+    <p>The next step is to check the quality of our reads by running fastqc.  We can do this on all of the files by using a for loop</p>
+
+div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+#!/bin/bash -l
+#PBS -q haswell
+#PBS -N run_fastqc
+#PBS -l nodes=1:ppn=1
+#PBS -l walltime=02:00:00
+#PBS -o out.txt
+#PBS -e err.txt
+
+cd #PBS_O_WORKDIR
+
+module load java
+module load fastqc
+
+for file in /home/nbumpus/raw_reads/*.fastq
+do
+fastqc -f fastq -o /home/nbumpus/raw_fastqc_reports/ ${file}
+done
+</code></pre></div></div>
+
+<p>These reads are already pretty clean but we need to remove the adapters from the overepresented sequences and headcrop the reads
+   from the per base sequence content.  We can do this for all of the reads at once with the following trimmomatic script/</p>
+
+div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+#!/bin/bash -l
+#PBS -q haswell
+#PBS -N run_trimmomatic
+#PBS -l nodes=1:ppn=1
+#PBS -l walltime=5:00:00
+#PBS -o out.txt
+#PBS -e err.txt
+
+cd #PBS_O_WORKDIR
+
+module load java
+module load trimmomatic
+
+reads="SRR6677976 SRR6677977_1.fastq SRR6677978_1.fastq
+SRR6677979_1.fastq SRR6677980_1.fastq SRR6677981_1.fastq"
+trimmer="ILLUMINACLIP:/opt/modules/universal/trimmomatic/0.36/adapters/TruSeq2-PE.fa:2:30:10 \
+HEADCROP:12 LEADING:25 TRAILING:25 MINLEN:40"
+infile='/home/nbumpus/raw_reads/'
+outfile='/home/nbumpus/trimmed_reads/'
+
+for file_1 in $reads
+do
+    file_2=$file_1
+    file_2="${file_1/_1/_2}"
+    file_1p="${file_1/.fastq/.paired.fastq}"
+    file_1u="${file_1/.fastq/.unpaired.fastq}"
+    file_2p="${file_2/.fastq/.paired.fastq}"
+    file_2u="${file_2/.fastq/.unpaired.fastq}"
+    java -jar /opt/modules/universal/trimmomatic/0.36/trimmomatic-0.36.jar PE -phred33 \
+$infile/$file_1 $infile/$file_2 $outfile/$file_1p $outfile/$file_1u $outfile/$file_2p \
+$outfile/$file_2u $trimmer
+done
+</code></pre></div></div>
+
+<p>In this script we only have to define the left reads and then the loop dervives the right reads from the names of the left reads.
+   Once the script finishes we can then modify the fastqc script to run on the trimmed reads to obtain the clean reads we need for further
+   analysis.</p>
+
+<p>Next is the alignment step.  Since we are using Mus musculus RNA seq reads we will want to download the genome fasta file from Ensembl to 
+   align the reads to using wget.  We will also need the corresponding gtf file again obtained using wget.  Note the name of these files in 
+   the following scripts. First index the downloaded fasta file.</p>
+ 
+div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+#!/bin/bash -l
+#PBS -q haswell
+#PBS -N run_hisat_ref
+#PBS -l nodes=1:ppn=1
+#PBS -l walltime=05:00:00
+#PBS -o out.txt
+#PBS -e err.txt
+
+cd #PBS_O_WORKDIR
+
+module load hisat2
+
+hisat2-build /home/nbumpus/mapping/Mus_musculus.GRCm38.dna_sm.toplevel.fa \
+/home/nbumpus/mapping/mus_musculus_genome
+</code></pre></div></div>
+
+<p>Next extract a list of known splice sites.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+#!/bin/bash -l
+#PBS -q haswell
+#PBS -N extract_splice_sites
+#PBS -l nodes=1:ppn=1
+#PBS -l walltime=01:00:00
+#PBS -o out.txt
+#PBS -e err.txt
+
+cd #PBS_O_WORKDIR
+
+module load python/3.5.1
+
+python /opt/modules/centos7/hisat2/2.1.0/extract_splice_sites.py \
+/home/nbumpus/mapping/Mus_musculus.GRCm38.96.gtf > \
+/home/nbumpus/mapping/splicesites.txt
+</code></pre></div></div>
+
+<p>Now we can use individual scripts to run our hisat2 alignment jobs for each set of reads in parallel.  Here is an example of one 
+   of the scripts.  Just modify it for each set of reads.  We are aiming for greater than 70 percent concordant mapping and greater
+   than 80 percent overall mapping.  If we look in the generated summary file we will see that this is the case.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+#!/bin/bash -l
+#PBS -q haswell
+#PBS -N hisat2_76
+#PBS -l nodes=1:ppn=2
+#PBS -l walltime=05:00:00
+#PBS -o out.txt
+#PBS -e err.txt
+
+cd #PBS_O_WORKDIR
+
+module load perl
+module load hisat2
+
+hisat2 -p 2 \
+--phred33 \
+--max-intronlen 5000 \
+--known-splicesite-infile /home/nbumpus/mapping/splicesites.txt \
+--rg-id SRR6677976 \
+--new-summary \
+--summary-file /home/nbumpus/mapping/SRR6677976.summary \
+-x /home/nbumpus/mapping/mus_musculus_genome \
+-1 /home/nbumpus/trimmed_reads/SRR6677976_1.paired.fastq \
+-2 /home/nbumpus/trimmed_reads/SRR6677976_2.paired.fastq \
+-S /home/nbumpus/mapping/SRR6677976.sam
+</code></pre></div></div>
+
+<p>We need to determine strand strand specificity of the reads in order for HTSeq to give us and accurate count.  One way to do this is
+   to visualize the mappings in IGV.  We can use samtools to create coordinate sorted bam files from our sam files created from mapping then
+   index those files along with the mus musculus fasta file</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+#!/bin/bash -l
+#PBS -q haswell
+#PBS -N run_samtools
+#PBS -l nodes=1:ppn=4
+#PBS -l walltime=24:00:00
+#PBS -o out.txt
+#PBS -e err.txt
+
+cd #PBS_O_WORKDIR
+
+module load samtools
+
+sam="SRR6677976.sam SRR6677977.sam SRR6677978.sam SRR6677979.sam SRR6677980.sam SRR6677981.sam"
+infile='/home/nbumpus/mapping/'
+outfile='/home/nbumpus/mapping/samtobam/'
+igvoutfile='/home/nbumpus/mapping/igv/'
+
+for file in $sam
+do
+    bam="${file/.sam/.bam}"
+    sortedbam="${bam/.bam/.coordsort.bam}"
+    samtools view -@4 -hb $infile/$file -o $outfile/$bam
+    samtools sort -@4 $outfile/$bam -o $igvoutfile/$sortedbam
+    samtools index $igvoutfile/$sortedbam
+done
+
+samtools faidx $infile/Mus_musculus.GRCm38.dna_sm.toplevel.fa
+</code></pre></div></div>
+
+<p>Now when we load these files into IGV we want to view as pair and color alignmnents by first-of-pair-strand.  We should notice that the 
+   greater than 75 percent of the mappings are of a single color.  This suggests that the reads are strand specific.</p>
+
+<p>Finally we can now use HTSeq to generate counts files that can later be used to construct a counts matrix using DESeq2 in R.  Here is the 
+   script.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+
+#!/bin/bash -l
+#PBS -q haswell
+#PBS -N run_htseq
+#PBS -l nodes=1:ppn=1
+#PBS -l walltime=24:00:00
+#PBS -o out.txt
+#PBS -e err.txt
+
+cd #PBS_O_WORKDIR
+
+module load python/3.5.1
+module load HTSeq
+
+sortedbam="SRR6677976.coordsort.bam SRR6677977.coordsort.bam SRR6677978.coordsort.bam
+SRR6677979.coordsort.bam SRR6677980.coordsort.bam SRR6677981.coordsort.bam"
+reference='/home/nbumpus/mapping/'
+infile='/home/nbumpus/mapping/igv/'
+outfile='/home/nbumpus/counts/'
+
+for file in $sortedbam
+do
+    counts="${file/.coordsort.bam/.counts}"
+    htseq-count -f bam -r name -s yes -t exon -i gene_id $infile/$file \
+$reference/Mus_musculus.GRCm38.96.gtf > $outfile/$counts
+done
+
+</code></pre></div></div>
+
+<p>There!  If all went well we should have a counts directory containing the counts files for each one of samples.  Up next is part two where
+   we attempt to build the matrix using DESeq2 in the R enviroment and perform the Differential Expression Analysis.  I should note that if
+   you are not comfortable using bash for loops you can always write individual scripts for each set of reads and run them in 
+   parallel.  Whichever way works for you is the best way to do it.  Happy coding!</p>
+    
+</div>
+
+      </div>
+    </div>
+
+    <label for="sidebar-checkbox" class="sidebar-toggle"></label>
+
+    <script>
+      (function(document) {
+        var toggle = document.querySelector('.sidebar-toggle');
+        var sidebar = document.querySelector('#sidebar');
+        var checkbox = document.querySelector('#sidebar-checkbox');
+
+        document.addEventListener('click', function(e) {
+          var target = e.target;
+
+          if(!checkbox.checked ||
+             sidebar.contains(target) ||
+             (target === checkbox || target === toggle)) return;
+
+          checkbox.checked = false;
+        }, false);
+      })(document);
+    </script>
+  </body>
+</html>
