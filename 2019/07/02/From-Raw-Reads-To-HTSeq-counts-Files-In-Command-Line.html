@@ -149,18 +149,12 @@ cd /home/nbumpus/sratoolkit.2.9.4-1-ubuntu64/bin/
 
 cd /home/nbumpus/sratoolkit.2.9.4-1-ubuntu64/bin/
 
-./fastq-dump.2.9.4 --outdir /home/nbumpus/raw_reads/ \
---defline-seq '@$sn[_$rn]/$ri' --split-files /home/nbumpus/ncbi/public/sra/SRR6677976.sra
-./fastq-dump.2.9.4 --outdir /home/nbumpus/raw_reads/ \
---defline-seq '@$sn[_$rn]/$ri' --split-files /home/nbumpus/ncbi/public/sra/SRR6677977.sra
-./fastq-dump.2.9.4 --outdir /home/nbumpus/raw_reads/ \
---defline-seq '@$sn[_$rn]/$ri' --split-files /home/nbumpus/ncbi/public/sra/SRR6677978.sra
-./fastq-dump.2.9.4 --outdir /home/nbumpus/raw_reads/ \
---defline-seq '@$sn[_$rn]/$ri' --split-files /home/nbumpus/ncbi/public/sra/SRR6677979.sra
-./fastq-dump.2.9.4 --outdir /home/nbumpus/raw_reads/ \
---defline-seq '@$sn[_$rn]/$ri' --split-files /home/nbumpus/ncbi/public/sra/SRR6677980.sra
-./fastq-dump.2.9.4 --outdir /home/nbumpus/raw_reads/ \
---defline-seq '@$sn[_$rn]/$ri' --split-files /home/nbumpus/ncbi/public/sra/SRR6677981.sra    
+./fastq-dump.2.9.4 --outdir /home/nbumpus/raw_reads/ --defline-seq '@$sn[_$rn]/$ri' --split-files /home/nbumpus/ncbi/public/sra/SRR6677976.sra
+./fastq-dump.2.9.4 --outdir /home/nbumpus/raw_reads/ --defline-seq '@$sn[_$rn]/$ri' --split-files /home/nbumpus/ncbi/public/sra/SRR6677977.sra
+./fastq-dump.2.9.4 --outdir /home/nbumpus/raw_reads/ --defline-seq '@$sn[_$rn]/$ri' --split-files /home/nbumpus/ncbi/public/sra/SRR6677978.sra
+./fastq-dump.2.9.4 --outdir /home/nbumpus/raw_reads/ --defline-seq '@$sn[_$rn]/$ri' --split-files /home/nbumpus/ncbi/public/sra/SRR6677979.sra
+./fastq-dump.2.9.4 --outdir /home/nbumpus/raw_reads/ --defline-seq '@$sn[_$rn]/$ri' --split-files /home/nbumpus/ncbi/public/sra/SRR6677980.sra
+./fastq-dump.2.9.4 --outdir /home/nbumpus/raw_reads/ --defline-seq '@$sn[_$rn]/$ri' --split-files /home/nbumpus/ncbi/public/sra/SRR6677981.sra    
 </code></pre></div></div>
 
     <p>The next step is to check the quality of our reads by running fastqc.  We can do this on all of the files by using a for loop</p>
@@ -204,8 +198,7 @@ module load trimmomatic
 
 reads="SRR6677976 SRR6677977_1.fastq SRR6677978_1.fastq
 SRR6677979_1.fastq SRR6677980_1.fastq SRR6677981_1.fastq"
-trimmer="ILLUMINACLIP:/opt/modules/universal/trimmomatic/0.36/adapters/TruSeq2-PE.fa:2:30:10 \
-HEADCROP:12 LEADING:25 TRAILING:25 MINLEN:40"
+trimmer="ILLUMINACLIP:/opt/modules/universal/trimmomatic/0.36/adapters/TruSeq2-PE.fa:2:30:10 HEADCROP:12 LEADING:25 TRAILING:25 MINLEN:40"
 infile='/home/nbumpus/raw_reads/'
 outfile='/home/nbumpus/trimmed_reads/'
 
@@ -217,9 +210,7 @@ do
     file_1u="${file_1/.fastq/.unpaired.fastq}"
     file_2p="${file_2/.fastq/.paired.fastq}"
     file_2u="${file_2/.fastq/.unpaired.fastq}"
-    java -jar /opt/modules/universal/trimmomatic/0.36/trimmomatic-0.36.jar PE -phred33 \
-$infile/$file_1 $infile/$file_2 $outfile/$file_1p $outfile/$file_1u $outfile/$file_2p \
-$outfile/$file_2u $trimmer
+    java -jar /opt/modules/universal/trimmomatic/0.36/trimmomatic-0.36.jar PE -phred33 $infile/$file_1 $infile/$file_2 $outfile/$file_1p $outfile/$file_1u $outfile/$file_2p $outfile/$file_2u $trimmer
 done
 </code></pre></div></div>
 
@@ -264,8 +255,7 @@ cd #PBS_O_WORKDIR
 module load python/3.5.1
 
 python /opt/modules/centos7/hisat2/2.1.0/extract_splice_sites.py \
-/home/nbumpus/mapping/Mus_musculus.GRCm38.96.gtf > \
-/home/nbumpus/mapping/splicesites.txt
+/home/nbumpus/mapping/Mus_musculus.GRCm38.96.gtf > /home/nbumpus/mapping/splicesites.txt
 </code></pre></div></div>
 
 <p>Now we can use individual scripts to run our hisat2 alignment jobs for each set of reads in parallel.  Here is an example of one 
@@ -354,8 +344,7 @@ cd #PBS_O_WORKDIR
 module load python/3.5.1
 module load HTSeq
 
-sortedbam="SRR6677976.coordsort.bam SRR6677977.coordsort.bam SRR6677978.coordsort.bam
-SRR6677979.coordsort.bam SRR6677980.coordsort.bam SRR6677981.coordsort.bam"
+sortedbam="SRR6677976.coordsort.bam SRR6677977.coordsort.bam SRR6677978.coordsort.bam SRR6677979.coordsort.bam SRR6677980.coordsort.bam SRR6677981.coordsort.bam"
 reference='/home/nbumpus/mapping/'
 infile='/home/nbumpus/mapping/igv/'
 outfile='/home/nbumpus/counts/'
@@ -363,8 +352,7 @@ outfile='/home/nbumpus/counts/'
 for file in $sortedbam
 do
     counts="${file/.coordsort.bam/.counts}"
-    htseq-count -f bam -r name -s yes -t exon -i gene_id $infile/$file \
-$reference/Mus_musculus.GRCm38.96.gtf > $outfile/$counts
+    htseq-count -f bam -r name -s yes -t exon -i gene_id $infile/$file $reference/Mus_musculus.GRCm38.96.gtf > $outfile/$counts
 done
 
 </code></pre></div></div>
