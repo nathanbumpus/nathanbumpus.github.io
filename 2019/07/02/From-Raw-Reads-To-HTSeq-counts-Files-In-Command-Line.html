@@ -117,7 +117,7 @@
 
     <p>First write a script to download the raw RNA seq reads using the SRA toolkit.  Here is mine.</p>
 
-div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
 #!/bin/bash -l
 #PBS -q haswell
 #PBS -N sradownload
@@ -138,7 +138,7 @@ cd /home/nbumpus/sratoolkit.2.9.4-1-ubuntu64/bin/
 
     <p>Next write a script to split the SRA files into left and right reads.
 
-div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
 #!/bin/bash -l
 #PBS -q haswell
 #PBS -N splitsra
@@ -165,7 +165,7 @@ cd /home/nbumpus/sratoolkit.2.9.4-1-ubuntu64/bin/
 
     <p>The next step is to check the quality of our reads by running fastqc.  We can do this on all of the files by using a for loop</p>
 
-div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
 #!/bin/bash -l
 #PBS -q haswell
 #PBS -N run_fastqc
@@ -188,7 +188,7 @@ done
 <p>These reads are already pretty clean but we need to remove the adapters from the overepresented sequences and headcrop the reads
    from the per base sequence content.  We can do this for all of the reads at once with the following trimmomatic script/</p>
 
-div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
 #!/bin/bash -l
 #PBS -q haswell
 #PBS -N run_trimmomatic
@@ -231,7 +231,7 @@ done
    align the reads to using wget.  We will also need the corresponding gtf file again obtained using wget.  Note the name of these files in 
    the following scripts. First index the downloaded fasta file.</p>
  
-div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
 #!/bin/bash -l
 #PBS -q haswell
 #PBS -N run_hisat_ref
