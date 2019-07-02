@@ -136,7 +136,7 @@ cd /home/nbumpus/sratoolkit.2.9.4-1-ubuntu64/bin/
 ./prefetch.2.9.4 -v SRR6677981
 </code></pre></div></div>
 
-    <p>Next write a script to split the SRA files into left and right reads.
+   <p>Next write a script to split the SRA files into left and right reads.</p>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
 #!/bin/bash -l
@@ -258,9 +258,9 @@ python /opt/modules/centos7/hisat2/2.1.0/extract_splice_sites.py \
 /home/nbumpus/mapping/Mus_musculus.GRCm38.96.gtf > /home/nbumpus/mapping/splicesites.txt
 </code></pre></div></div>
 
-<p>Now we can use individual scripts to run our hisat2 alignment jobs for each set of reads in parallel.  Here is an example of one 
-   of the scripts.  Just modify it for each set of reads.  We are aiming for greater than 70 percent concordant mapping and greater
-   than 80 percent overall mapping.  If we look in the generated summary file we will see that this is the case.</p>
+<p>Now we can use individual scripts to run our hisat2 alignment jobs for each set of reads in parallel.  We are aiming for greater than 70 percent concordant mapping and greater
+   than 80 percent overall mapping.  If we look in the generated summary file we will see that this is the case.  Here is an example of one 
+   of the scripts.  Just modify it for each set of reads.</p>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
 #!/bin/bash -l
