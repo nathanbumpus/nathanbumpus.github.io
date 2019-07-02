@@ -107,11 +107,11 @@
 
       <div class="container content">
         <div class="page">
-  <h1 class="page-title">34 Years of United States Homicide Statistics</h1>
+  <h1 class="page-title" align="center">34 Years of United States Homicide Statistics</h1>
     <p><a id="top"></a>Here is a project that I put together using an open source data set from Kaggle containing United States homicide data
        spanning the years 1980-2014. The purpose of this project is really just to show some of the cool graphs you can make using python. I made 
        use of the pandas, matplotlib, scipy and numpy python libraries.  If, for some reason, you are interested in downloading this data set you 
-       can do so from this <a href="https://www.kaggle.com/murderaccountability/homicide-reports">link</a>.</p>
+       can do so from this <a href="https://www.kaggle.com/murderaccountability/homicide-reports" target="_blank">link</a>.</p>
 
     <p>The first step of my analysis was to separate the the data set into two dataframes.  One for United States homicides and one for 
        homicides occuring in the state of Maine.  Once this is done we can begin with a comparison of Perpetrator and Victim Ages for both 
@@ -120,7 +120,7 @@
     <p align="center">
       <img src="/assets/images/boxplots.png" alt="boxplots"></p>
 
-    <p>We can also look at the histograms plotted against an estimated gaussian distribution like so.</p>
+    <p>We can also look at the histograms plotted against an estimated gaussian curve to visualize the distribution of ages like so.</p>
 
     <p align="center">
       <img src="/assets/images/histograms.png" alt="histograms"></p>
@@ -132,21 +132,23 @@
       <img src="/assets/images/lines.png" alt="lines"></p>
 
     <p>Here are some general stats we can derive from the data concerning the ages of the perpetrators and victims</p>
+          
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
                               Homicide Age Statistics
-      National Statistics                 Maine Statistics                
-               Victim Age Perpetrator Age       Victim Age Perpetrator Age
-count           397625.00       397625.00           727.00          727.00
-mean                33.70           30.80            37.24           33.72
-std                 16.91           12.84            18.76           13.36
-min                  1.00            6.00             1.00            6.00
-25%                 22.00           21.00            23.50           23.00
-50%                 30.00           27.00            35.00           32.00
-75%                 42.00           37.00            49.00           42.00
-max                 99.00           99.00            99.00           86.00
+               National Statistics          Maine Statistics                
+           Victim Age  Perpetrator Age  Victim Age Perpetrator Age
+count      397625.00       397625.00       727.00      727.00
+mean           33.70           30.80        37.24       33.72
+std            16.91           12.84        18.76       13.36
+min             1.00            6.00         1.00        6.00
+25%            22.00           21.00        23.50       23.00
+50%            30.00           27.00        35.00       32.00
+75%            42.00           37.00        49.00       42.00
+max            99.00           99.00        99.00       86.00
 
 </code></pre></div></div>
+
 
     <p>Generally speaking the perpetrators are usually younger than their victims.</p>
     
@@ -278,8 +280,10 @@ def perp_vs_vict(df_nation, df_maine):
 
     perp_age = df_nation['Perpetrator Age'].groupby('Year').median()
     vict_age = df_nation['Victim Age'].groupby('Year').median()
-    maine_perp_age = df_maine['Perpetrator Age'].groupby('Year').median()
-    maine_vict_age = df_maine['Victim Age'].groupby('Year').median()
+    maine_perp_age = 
+        df_maine['Perpetrator Age'].groupby('Year').median()
+    maine_vict_age = 
+        df_maine['Victim Age'].groupby('Year').median()
     nperp_age = df_nation['Perpetrator Age']
     mperp_age = df_maine['Perpetrator Age']
     nvict_age = df_nation['Victim Age']
@@ -287,18 +291,25 @@ def perp_vs_vict(df_nation, df_maine):
 
 #Age Boxplots
     boxes = [nperp_age, mperp_age, nvict_age, mvict_age]
-    labels = ['National Perpetrator', 'Maine Perpetrator', 'National Victim', 'Maine Victim']
+    labels = ['National Perpetrator', 'Maine Perpetrator', 
+              'National Victim', 'Maine Victim']
     fig = plt.figure(figsize = (13, 6.5))
-    plt.boxplot(boxes, labels = labels, patch_artist = True, showfliers = False, medianprops = dict(linewidth=1,
+    plt.boxplot(boxes, labels = labels, patch_artist = True, 
+                showfliers = False, medianprops = dict(linewidth=1,
                 color = 'black'))
-    plt.title('Boxplots of Perpetrator and Victim Ages (outliers removed)')
+    plt.title('Boxplots of Perpetrator and Victim Ages 
+              (outliers removed)')
     plt.ylabel('Age')
     plt.show()
 
 #Age Histograms with Fitted Gaussian Distribution
-    fig1, axes = plt.subplots(nrows = 2, ncols = 2, tight_layout = True, figsize = (13, 6.5))
+    fig1, axes = plt.subplots(nrows = 2, ncols = 2, 
+                             tight_layout = True, 
+                             figsize = (13, 6.5))
     bins = 50
-    n, bins, patches = axes[0, 0].hist(np.array(nperp_age), bins, density = True, color = 'blue')
+    n, bins, patches = axes[0, 0].hist(np.array(nperp_age), bins, 
+                                       density = True, 
+                                       color = 'blue')
     (mu, sigma) = scipy.stats.norm.fit(nperp_age)
     y = scipy.stats.norm.pdf(bins, mu, sigma)
     axes[0, 0].plot(bins, y, 'k--', linewidth = 2)
@@ -306,7 +317,9 @@ def perp_vs_vict(df_nation, df_maine):
     axes[0, 0].set_ylabel('Frequency')
     axes[0, 0].set_xlabel('Age')
 
-    n, bins, patches = axes[0,1].hist(np.array(mperp_age), bins, density = True, color = 'green')
+    n, bins, patches = axes[0,1].hist(np.array(mperp_age), bins, 
+                                      density = True, 
+                                      color = 'green')
     (mu, sigma) = scipy.stats.norm.fit(mperp_age)
     y = scipy.stats.norm.pdf(bins, mu, sigma)
     axes[0, 1].plot(bins, y, 'k--', linewidth = 2)
@@ -314,7 +327,9 @@ def perp_vs_vict(df_nation, df_maine):
     axes[0, 1].set_ylabel('Frequency')
     axes[0, 1].set_xlabel('Age')
 
-    n, bins, patches = axes[1, 0].hist(np.array(nvict_age), bins, density = True, color = 'red')
+    n, bins, patches = axes[1, 0].hist(np.array(nvict_age), bins, 
+                                       density = True, 
+                                       color = 'red')
     (mu, sigma) = scipy.stats.norm.fit(nvict_age)
     y = scipy.stats.norm.pdf(bins, mu, sigma)
     axes[1, 0].plot(bins, y, 'k--', linewidth = 2)
@@ -322,7 +337,9 @@ def perp_vs_vict(df_nation, df_maine):
     axes[1, 0].set_ylabel('Frequency')
     axes[1, 0].set_xlabel('Age')
 
-    n, bins, patches = axes[1, 1].hist(np.array(mvict_age), bins, density = True, color = 'orange')
+    n, bins, patches = axes[1, 1].hist(np.array(mvict_age), bins, 
+                                       density = True, 
+                                       color = 'orange')
     (mu, sigma) = scipy.stats.norm.fit(mvict_age)
     y = scipy.stats.norm.pdf(bins, mu, sigma)
     axes[1, 1].plot(bins, y, 'k--', linewidth = 2)
@@ -338,14 +355,18 @@ def perp_vs_vict(df_nation, df_maine):
     ax1 = fig2.add_subplot(211)
     ax1.plot(perp_age, label='Perpetrator', color='blue')
     ax1.plot(vict_age, label='Victim', color='red')
-    ax1.set_title('National Perpetrator and Victim Median Ages')
+    ax1.set_title('National Perpetrator and Victim Median 
+                  Ages')
     ax1.set_ylabel('Median Age')
     ax1.set_xlabel('Year')
     ax1.legend()
     ax2 = fig2.add_subplot(212)
-    ax2.plot(maine_perp_age, label='Perpetrator', color='green')
-    ax2.plot(maine_vict_age, label='Victim', color='orange')
-    ax2.set_title('Maine Perpetrator and Victim Median Ages')
+    ax2.plot(maine_perp_age, label='Perpetrator', 
+             color='green')
+    ax2.plot(maine_vict_age, label='Victim', 
+             color='orange')
+    ax2.set_title('Maine Perpetrator and Victim Median 
+                  Ages')
     ax2.set_ylabel('Median Age')
     ax2.set_xlabel('Year')
     ax2.legend()
@@ -354,8 +375,10 @@ def perp_vs_vict(df_nation, df_maine):
 
 #Age Statistics Table
     print('{: >45}'.format("Homicide Age Statistics"))
-    print(pd.concat([df_nation.describe().round(2), df_maine.describe().round(2)], keys = ['National Statistics',
-                        'Maine Statistics'], axis = 1))
+    print(pd.concat([df_nation.describe().round(2), 
+                     df_maine.describe().round(2)], 
+                     keys = ['National Statistics',
+                     'Maine Statistics'], axis = 1))
 
 def weapons(df_nation, df_maine):
 
@@ -367,31 +390,42 @@ def weapons(df_nation, df_maine):
 #Weapons Barplot
     bars = [n_weap_freq, m_weap_freq]
     x = np.arange(7)
-    labels = ['Asphyxiation', 'Blunt Object', 'Drowning or Fall', 'Explosives or Fire', 'Firearm', 'Knife',
+    labels = ['Asphyxiation', 'Blunt Object', 'Drowning or Fall', 
+              'Explosives or Fire', 'Firearm', 'Knife', 
               'Poison or Drugs']
     fig = plt.figure(figsize = (13, 6.5))
-    plt.bar(x - 0.2, bars[0], color = 'blue', width = 0.4, label = 'National')
-    plt.bar(x + 0.2, bars[1], color = 'green', width = 0.4, label = 'Maine')
+    plt.bar(x - 0.2, bars[0], color = 'blue', width = 0.4, 
+            label = 'National')
+    plt.bar(x + 0.2, bars[1], color = 'green', width = 0.4, 
+            label = 'Maine')
     plt.xticks(x, labels)
-    plt.legend(loc = 1, bbox_to_anchor = (0.20, 0.85), prop = {'size' :  15})
+    plt.legend(loc = 1, bbox_to_anchor = (0.20, 0.85), 
+               prop = {'size' :  15})
     plt.ylabel('% of Homicides')
     plt.xlabel('Weapons Used')
     plt.title('Weapons Used in Homicides')
-    plt.annotate('Firearms are the most popular weapons', xy = (4, 60), xytext = (0, 35),
-                 arrowprops = dict(facecolor = 'black', shrink = 0.2))
+    plt.annotate('Firearms are the most popular weapons', 
+                 xy = (4, 60), xytext = (0, 35), 
+                 arrowprops = dict(facecolor = 'black', 
+                 shrink = 0.2))
     plt.tight_layout()
     plt.show()
 
 #Weapons Statistics Table
     print()
-    print('{:>38}'.format("Percentage of Total Homicides by Weapon"))
+    print('{:>38}'.format("Percentage of Total Homicides 
+          by Weapon"))
     print()
-    print(pd.concat([n_weap_freq.round(2), m_weap_freq.round(2)], keys = ['National %', 'Maine %'], axis = 1))
+    print(pd.concat([n_weap_freq.round(2), 
+                    m_weap_freq.round(2)], 
+                    keys = ['National %', 'Maine %'], 
+                    axis = 1))
 
 def months(df_nation, df_maine):
 
-    categories = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October',
-                  'November', 'December']
+    categories = ['January', 'February', 'March', 'April', 
+                  'May','June', 'July', 'August', 'September', 
+                  'October', 'November', 'December']
     x = np.arange(12)
     nseason = pd.Categorical(df_nation['Month'], categories)
     mseason = pd.Categorical(df_maine['Month'], categories)
@@ -403,7 +437,8 @@ def months(df_nation, df_maine):
     myear_per = myear / len(df_maine) * 100
 
 #Total Homicides by Year
-    nyear_per.plot(label = 'National', color = 'blue', figsize = (13, 6.5))
+    nyear_per.plot(label = 'National', color = 'blue', 
+                   figsize = (13, 6.5))
     myear_per.plot(label = 'Maine', color = 'green')
     plt.title('Percentage of Total Homicides by Year')
     plt.ylabel('Percent')
@@ -412,15 +447,20 @@ def months(df_nation, df_maine):
     plt.show()
 
 #Months Pie Plots
-    fig1 , ax1 = plt.subplots(ncols = 2, nrows = 1, figsize = (13, 6.5))
-    explode = (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0)
-    ax1[0].pie(np.array(nseason_freq), labels = categories, shadow = True, startangle = 90,
-            autopct = '%1.1f%%', explode = explode)
+    fig1 , ax1 = plt.subplots(ncols = 2, nrows = 1, 
+                             figsize = (13, 6.5))
+    explode = (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 
+               0.0, 0.0, 0.0, 0.0, 0.0)
+    ax1[0].pie(np.array(nseason_freq), labels = categories, 
+               shadow = True, startangle = 90, 
+               autopct = '%1.1f%%', explode = explode)
     ax1[0].axis('equal')
     ax1[0].set_title('National Percent of Total Homicides by Month')
-    explode = (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0)
-    ax1[1].pie(np.array(mseason_freq), labels = categories, shadow = True, startangle = 90,
-               autopct = '%1.1f%%', explode = explode)
+    explode = (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+               0.5, 0.0)
+    ax1[1].pie(np.array(mseason_freq), labels = categories, 
+               shadow = True, startangle = 90, autopct = '%1.1f%%', 
+               explode = explode)
     ax1[1].axis('equal')
     ax1[1].set_title('Maine Percent of Total Homicides by Month')
     plt.show()
@@ -429,11 +469,13 @@ def months(df_nation, df_maine):
     print()
     print("Percent of Total Homicides by Year")
     print()
-    print(pd.concat([nyear_per.round(2), myear_per.round(2)], keys = ['National %', 'Maine %'], axis = 1))
+    print(pd.concat([nyear_per.round(2), myear_per.round(2)], 
+                    keys = ['National %', 'Maine %'], axis = 1))
     print()
     print("Percent of Total Homicides by Month")
     print()
-    print(pd.concat([nseason_freq.round(2), mseason_freq.round(2)], keys = ['National %', 'Maine %'], axis = 1))
+    print(pd.concat([nseason_freq.round(2), mseason_freq.round(2)], 
+                    keys = ['National %', 'Maine %'], axis = 1))
 
 
 #Clean data resulting in two dataframes
@@ -454,7 +496,8 @@ del df['City']
 del df['Victim Race']
 del df['Crime Type']
 df.to_csv('database_v2.csv', encoding = 'UTF-8')
-df = pd.read_csv('database_v2.csv',index_col = 0, low_memory = False)
+df = pd.read_csv('database_v2.csv',index_col = 0, 
+                 low_memory = False)
 df.set_index('Year', inplace = True)
 df = df.replace('Unknown', np.NaN)
 df = df.replace(0, np.NaN)
@@ -464,23 +507,32 @@ df = df[ df['Perpetrator Age'] < 123]
 df = df[ df['Perpetrator Age'] > 5]
 df = df[df['Victim Age'] < 123]
 df = df[df['Victim Age'] > 0]
-df['Weapon'] = df['Weapon'].replace(('Handgun', 'Shotgun', 'Gun', 'Rifle'), 'Firearm')
-df['Weapon'] = df['Weapon'].replace(('Drowning', 'Fall'), 'Drowning or Fall')
-df['Weapon'] = df['Weapon'].replace(('Explosives', 'Fire'), 'Explosives or Fire')
-df['Weapon'] = df['Weapon'].replace(('Poison', 'Drugs'), 'Poison or Drugs')
-df['Weapon'] = df['Weapon'].replace(('Strangulation', 'Suffocation'), 'Asphyxiation')
+df['Weapon'] = df['Weapon'].replace(('Handgun', 'Shotgun', 
+                  'Gun', 'Rifle'), 'Firearm')
+df['Weapon'] = df['Weapon'].replace(('Drowning', 'Fall'), 
+                  'Drowning or Fall')
+df['Weapon'] = df['Weapon'].replace(('Explosives', 'Fire'), 
+                  'Explosives or Fire')
+df['Weapon'] = df['Weapon'].replace(('Poison', 'Drugs'), 
+                  'Poison or Drugs')
+df['Weapon'] = df['Weapon'].replace(('Strangulation', 
+                  'Suffocation'), 'Asphyxiation')
 df_nation = df
 df_maine = df[df_nation['State'] == 'Maine']
 
 #User Interface
-print("This program provides an analysis of Homicide Data collected from 1980 - 2014")
+print("This program provides an analysis of Homicide Data 
+       collected from 1980 - 2014")
 resp = 'y'
 while resp[0] == 'y':
     print("Please choose from the following options.")
     print()
-    print("Enter 1 to view analysis of Perpetrator and Victim Ages.")
-    print("Enter 2 to view an analysis Weapons Used.")
-    print("Enter 3 to view an analysis homicides by year and month.")
+    print("Enter 1 to view analysis of Perpetrator and 
+          Victim Ages.")
+    print("Enter 2 to view an analysis Weapons 
+          Used.")
+    print("Enter 3 to view an analysis homicides by year 
+          and month.")
     print()
     choice = input("Which option do you choose?: ")
     if choice == '1':
@@ -493,9 +545,11 @@ while resp[0] == 'y':
         print("You must enter a number from 1 to 3.")
         resp = 'y'
     print()
-    resp = input("Would you like to view more Homicide Analysis? y/n: ").lower()
+    resp = input("Would you like to view more Homicide 
+                 Analysis? y/n: ").lower()
     while resp[0] != 'y' and resp[0] != 'n':
-        resp = input("Please enter y or n to continue: ").lower()
+        resp = input("Please enter y or n to 
+                     continue: ").lower()
 print("Thanks for watching")
 
 </code></pre></div></div>
