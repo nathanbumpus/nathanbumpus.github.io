@@ -111,9 +111,9 @@
     <p><a id="top"></a>Here is part one of a two part series focussing on using raw RNA seq reads deposited in the NCBI SRA database
        to perform Differential expression analysis between groups of replicates.  This first part focusses on using the command line to 
        obtain raw RNA seq data, clean the data and generate HTSeq counts files.  The second part of this series will focus on using the 
-       R package DESeq2 to generate a counts matrix and samples table used to perform Differential Expression Analysis.  The data for this 
-       are located at NCBI under bioproject number PRJNA433234.  
-       The paper using this data is located <a href="https://www.nature.com/articles/s41588-018-0252-3" target="_blank">here</a>.</p>
+       R package DESeq2 to generate a model with which to perform Differential Expression Analysis.  The data used for this project
+       islocated at NCBI under bioproject number PRJNA433234.  
+       The paper that resulted from the data is located <a href="https://www.nature.com/articles/s41588-018-0252-3" target="_blank">here</a>.</p>
 
     <p>First write a script to download the raw RNA seq reads using the SRA toolkit.  Here is mine.</p>
 
@@ -179,8 +179,8 @@ fastqc -f fastq -o /home/nbumpus/raw_fastqc_reports/ ${file}
 done
 </code></pre></div></div>
 
-<p>These reads are already pretty clean but we need to remove the adapters from the overepresented sequences and headcrop the reads
-   from the per base sequence content.  We can do this for all of the reads at once with the following trimmomatic script/</p>
+<p>These reads are already pretty clean but we need to remove the adapters, blast the overepresented sequences and headcrop the reads
+   to correct the per base sequence content.  We can do this for all of the reads at once with the following trimmomatic script/</p>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
 #!/bin/bash -l
@@ -291,7 +291,7 @@ hisat2 -p 2 \
 
 <p>We need to determine strand strand specificity of the reads in order for HTSeq to give us and accurate count.  One way to do this is
    to visualize the mappings in IGV.  We can use samtools to create coordinate sorted bam files from our sam files created from mapping then
-   index those files along with the mus musculus fasta file</p>
+   index those files along with the Mus musculus fasta file</p>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
 #!/bin/bash -l
@@ -326,7 +326,7 @@ samtools faidx $infile/Mus_musculus.GRCm38.dna_sm.toplevel.fa
 <p>Now when we load these files into IGV we want to view as pair and color alignmnents by first-of-pair-strand.  We should notice that the 
    greater than 75 percent of the mappings are of a single color.  This suggests that the reads are strand specific.</p>
 
-<p>Finally we can now use HTSeq to generate counts files that can later be used to construct a counts matrix using DESeq2 in R.  Here is the 
+<p>Finally we can now use HTSeq to generate counts files that can be used to construct a DESeq object in R.  Here is the 
    script.</p>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
@@ -357,8 +357,8 @@ done
 
 </code></pre></div></div>
 
-<p>There!  If all went well we should have a counts directory containing the counts files for each one of samples.  Up next is part two where
-   we attempt to build the matrix using DESeq2 in the R enviroment and perform the Differential Expression Analysis.  I should note that if
+<p>There!  If all went well we should have a counts directory containing the counts files for each one of the samples.  Up next is part two where
+   we attempt to build the DESeq object in the R enviroment and perform the Differential Expression Analysis.  I should note that if
    you are not comfortable using bash for loops you can always write individual scripts for each set of reads and run them in 
    parallel.  Whichever way works for you is the best way to do it.  Happy coding!</p>
     
